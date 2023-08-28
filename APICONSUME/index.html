@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <hr>
+        <h4>Game List</h4>
+        <ul id="games"></ul>
+        <hr>
+        <h4>Add Game</h4>
+        <input type="text" name="title" id="title" placeholder="title"><br>
+        <input type="number" name="year" id="year" placeholder="year"><br>
+        <input type="number" name="price" id="price" placeholder="price"><br>
+        <button type="button" onclick="addGame()">Add</button>
+        <hr>
+        <h4>Edit Game</h4>
+        <input type="text" name="idEdit" id="idEdit" placeholder="Id" readonly><br>
+        <input type="text" name="titleEdit" id="titleEdit" placeholder="title"><br>
+        <input type="number" name="yearEdit" id="yearEdit" placeholder="year"><br>
+        <input type="number" name="priceEdit" id="priceEdit" placeholder="price"><br>
+        <button type="button" onclick="updateGame()">Edit</button>
+    </head>
+    <body>
+
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // Delete Game function
+        function delGame(listItem){
+            let id = listItem.getAttribute('data-id')
+            axios.delete("http://localhost:8080/game/" + id).then(res => {
+                alert("Game deleted")
+            }).catch(err => {
+                console.log(err)
+            })
+        }
+
+        // Load Form function
+        function loadForm(listItem){
+            let id = listItem.getAttribute("data-id")
+            let title = listItem.getAttribute("data-title")
+            let year = listItem.getAttribute("data-year")
+            let price = listItem.getAttribute("data-price")
+
+            document.querySelector('#idEdit').value = id
+            document.querySelector('#titleEdit').value = title
+            document.querySelector('#yearEdit').value = year
+            document.querySelector('#priceEdit').value = price
+
+        }
+
+        // Update game function
+        function updateGame(){
+            
+            let idInput = document.querySelector('#idEdit')
+            let titleInput = document.querySelector('#titleEdit')
+            let yearInput = document.querySelector('#yearEdit')
+            let priceInput = document.querySelector('#priceEdit')
+
+            let game = {
+                title: titleInput.value,
+                year: yearInput.value,
+                price: priceInput.value
+            }
+            
+            let id = idInput.value
+            axios.put('http://localhost:8080/game/' + id, game).then(res => {
+                if(res.status = 200){
+                    alert("Game updated")
+                }
+            }) 
+
+        }
+
+        // List all games
+        axios.get("http://localhost:8080/games").then(res => {
+            let games = res.data
+            let list = document.querySelector('#games')
+
+            games.forEach(game => {
+                let item = document.createElement('li')
+
+                item.setAttribute("data-id", game.id)
+                item.setAttribute("data-title", game.title)
+                item.setAttribute("data-year", game.year)
+                item.setAttribute("data-price", game.price)
+
+                item.innerHTML = game.id + " - " + game.title + " - $" + game.price 
+
+                let delButton = document.createElement('button')
+                delButton.innerHTML = "Delete"
+
+                delButton.addEventListener("click", () =>{
+                    delGame(item)
+                })
+
+                let editButton = document.createElement('button')
+                editButton.innerHTML = "Edit"
+                
+                // Loading the form and editing on click
+                editButton.addEventListener("click", () => {
+                    loadForm(item)
+                })
+
+                item.appendChild(delButton)
+                item.appendChild(editButton)
+
+                list.appendChild(item)
+            })
+        }).catch(err => {
+            console.log(err)
+        })
+
+        // Add game
+        function addGame(){
+            let titleInput = document.querySelector('#title')
+            let yearInput = document.querySelector('#year')
+            let priceInput = document.querySelector('#price')
+
+            let game = {
+                title: titleInput.value,
+                year: yearInput.value,
+                price: priceInput.value
+            }
+
+            axios.post('http://localhost:8080/game', game).then(res => {
+                if(res.status = 200){
+                    alert("Game added")
+                }
+            }) 
+        }
+
+
+    </script>
+</html>
