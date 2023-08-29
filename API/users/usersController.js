@@ -1,7 +1,9 @@
 const express = require("express")
 const User = require("./User")
 const router = express.Router()
+const jwt = require("jsonwebtoken")
 
+const jwtSecret = "salgadodefeira"
 router.get('/users', (req, res) => {
     User.findAll().then(users => {
         res.json(users)
@@ -37,7 +39,15 @@ router.post('/auth', (req, res) => {
         }).then(user => {
             if(user.password == password){
                 res.status(200)
-                res.json("False Token")
+                jwt.sign({id: user.id, email: user.email}, jwtSecret, {expiresIn: '48h'}, (err, token) => {
+                    if(err){
+                        res.status(400)
+                        res.json({err: "Intern failure"})
+                    } else {
+                        res.status(200)
+                        res.json({token: token})
+                    }
+                })
             } else{
                 res.status(401)
                 res.json({err: "Incorrect password!"})

@@ -1,13 +1,42 @@
 const express = require("express")
 const Game = require("./Game")
 const router = express.Router()
+const jwt = require("jsonwebtoken")
+const jwtSecret = "salgadodefeira"
 
-router.get('/games', (req, res) => {
+// Authenticantion function
+function auth(req, res, next){
+    const authToken = req.headers['authorization']
+    if(authToken != undefined){
+        const bearer = authToken.split(" ")
+        const token = bearer[1]
+        jwt.verify(token, jwtSecret, (err, data) => {
+            if(err){
+                res.status(401)
+                res.json({err: "Token don't match"})
+            } else {
+                req.token = token
+                req.loggedUser = {id: data.id, email: data.email}
+                next()
+            }
+        })
+
+
+        res.status(200)
+    } else{
+        res.status(401)
+        res.json({err: "Invalid Token!"})
+    }
+    console.log(authToken)
+}
+
+// Get all games
+router.get('/games', auth, (req, res) => {
     Game.findAll()
         .then(games => {
             res.json(games)
         })
-    res.statusCode = 200
+    res.status(200)
 })
 
 // Get game by id

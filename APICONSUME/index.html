@@ -26,6 +26,12 @@
     </body>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
+        let axiosConfig = {
+            headers: {
+                authorization: "Bearer " + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ2aXRvcm9saXZlaXJhMDA1QGdtYWlsLmNvbSIsImlhdCI6MTY5MzMyNzQ0OSwiZXhwIjoxNjkzNTAwMjQ5fQ.SgRduF7zIYhJaZQpdtaHEoJLWTYvoX2oFd9nOOE1VhU"
+            }
+        }
+
         // Delete Game function
         function delGame(listItem){
             let id = listItem.getAttribute('data-id')
