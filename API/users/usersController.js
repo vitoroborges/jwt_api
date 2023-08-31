@@ -31,7 +31,7 @@ router.post('/user', (req, res) => {
 router.post('/auth', (req, res) => {
     let {email, password} = req.body
 
-    if(email != undefined && password != undefined){
+    if(email != undefined){
         User.findOne({
             where: {
                 email: email

@@ -8,7 +8,7 @@ const jwtSecret = "salgadodefeira"
 function auth(req, res, next){
     const authToken = req.headers['authorization']
     if(authToken != undefined){
-        const bearer = authToken.split(" ")
+        const bearer = authToken.split(' ')
         const token = bearer[1]
         jwt.verify(token, jwtSecret, (err, data) => {
             if(err){
@@ -20,9 +20,6 @@ function auth(req, res, next){
                 next()
             }
         })
-
-
-        res.status(200)
     } else{
         res.status(401)
         res.json({err: "Invalid Token!"})
@@ -35,12 +32,14 @@ router.get('/games', auth, (req, res) => {
     Game.findAll()
         .then(games => {
             res.json(games)
-        })
+        }).catch(error => {
+            res.status(500).json({ error: "Internal Server Error" });
+        });
     res.status(200)
 })
 
 // Get game by id
-router.get('/game/:id', (req, res) => {
+router.get('/game/:id',auth, (req, res) => {
     if(isNaN(req.params.id)){
         res.sendStatus(400)
     } else{
@@ -50,7 +49,7 @@ router.get('/game/:id', (req, res) => {
         })
             .then(game => {
                 if(game != undefined){
-                    res.statusCode = 200
+                    res.status(200)
                     res.json(game)
                 }
             })
@@ -62,7 +61,7 @@ router.get('/game/:id', (req, res) => {
 })
 
 // Add game
-router.post('/game', (req, res) => {
+router.post('/game',auth, (req, res) => {
     let {title, year, price} = req.body
 
     Game.create({
@@ -75,7 +74,7 @@ router.post('/game', (req, res) => {
 })
 
 // Delete Game
-router.delete('/game/:id', (req, res)=>{
+router.delete('/game/:id', auth, (req, res)=>{
     if(isNaN(req.params.id)){
         res.sendStatus(400)
     } else{
@@ -87,7 +86,7 @@ router.delete('/game/:id', (req, res)=>{
 })
 
 // Update Data
-router.put('/game/:id', (req, res) => {
+router.put('/game/:id', auth, (req, res) => {
     if(isNaN(req.params.id)){
         res.sendStatus(400)
     } else{
